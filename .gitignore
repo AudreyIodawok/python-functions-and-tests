@@ -1,0 +1,9 @@
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore __pycache__ folders in source and tests directories
+source/__pycache__/
+tests/__pycache__/
+
+# Ignore environment
+venv/

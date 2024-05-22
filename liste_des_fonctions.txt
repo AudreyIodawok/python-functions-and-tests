@@ -1,0 +1,157 @@
+********************************************************************************************************
+Liste des fonctions
+********************************************************************************************************
+
+--------------------------------------------------------------------------------------------------------
+1. modify_df : from source.fonctions import modify_df / Transforme un df et retourne le df original 
+modifié.
+
+def modify_df(in_df : pd.DataFrame) -> pd.DataFrame:
+    in_df["name_cap"] = in_df["name"].str.title()
+    return in_df
+--------------------------------------------------------------------------------------------------------
+
+2. modify_df_2 : from source.fonctions import modify_df_2 / Transforme un df directement et ne retourne 
+rien.
+
+def modify_df_2(in_df : pd. DataFrame) -> None:
+    in_df["name_cap"] = in_df["name"].str.title()
+--------------------------------------------------------------------------------------------------------
+
+3. modify_string : from source.fonctions import modify_string / Prend un string en entrée et retourne un 
+string modifié.
+
+def modify_string(string : str) -> str:
+    string = string.title()
+    return string
+--------------------------------------------------------------------------------------------------------
+
+4. find_max_name_length : from source.fonctions import find_max_name_length / Ajoute une colonne "name_len"
+au df original, puis retourne la longueur de la chaine de caractère maximale contenue dans la colonne.
+
+def find_max_name_length(df: pd.DataFrame) -> int:
+    df["name_len"] = df["name"].str.len() # effet secondaire
+    return max(df["name_len"])
+--------------------------------------------------------------------------------------------------------
+
+5. find_max_name_length_bis : from source.fonctions import find_max_name_length_bis / Si le df n'est pas
+vide et si la colonne "name" est du type objet, ajoute une colonne "name_len" contenant les longueurs de
+chaine de caractère des éléments de "name" et retourne la longueur max de chaine, sinon retourne "0".
+
+def find_max_name_length_bis(df: pd.DataFrame) -> int:
+    if not df.empty and df["name"].dtype == "object":
+        df["name_len"] = df["name"].str.len() # Effet secondaire
+        return max(df["name_len"])
+--------------------------------------------------------------------------------------------------------
+
+6. find_max_name_length_ter : from source.fonctions import find_max_name_length_ter / Crée une variable
+temporaire "lengths" de type series basée sur la colonne "name" et qui calcule la longueur de chaine
+de caractère de chaque élément de "name". La fonction retourne enfin la longueur de la chaine de 
+caractère max.
+
+def find_max_name_length_series_ter(df: pd.DataFrame) -> int:
+    lengths: pd.Series = df["name"].str.len()
+    return max(lengths)
+--------------------------------------------------------------------------------------------------------
+
+7. calculate_name_lengths : from source.fonctions import calculate_name_lengths / Calcule de nombre de 
+caractères de chaque élément de la colonne "name" et retourne une série. Cette fonction peut ensuite 
+être utilisée pour créer une colonne "name_len" dans le dataframe.
+
+def calculate_name_lengths(df: pd.DataFrame) -> pd.Series:
+    return df["name"].str.len()
+--------------------------------------------------------------------------------------------------------
+
+8 et 8 bis. create_name_len_col et find_max_element : from source.fonctions import create_name_len_col, 
+find_max_element / La première utilise en entrée une série de noms et retourne une série de longueurs de
+caractères basé sur chaque élément de la série de nom. La deuxième retourne la longueur max de la collection
+d'éléments renvoyé par la fonction create_name_len_col. On utilise la première fonction pour créer une
+série str.len contenant les longueurs de chaines de caractères puis la deuxième pour trouver le plus grand
+élément contenu dans la collection d'entiers.
+
+def create_name_len_col(series: pd.Series) -> pd.Series: # entrée : objet du type pd.Series, sortie : idem
+    return series.str.len() # retourne la longueur de la chaine de caractère de chaque élément de la série
+
+def find_max_element(collection: Collection) -> int: # entrée : collection d'éléments de type entier
+    return max(collection) if len(collection) else 0 # renvoie l'élément max si existe, sinon 0
+--------------------------------------------------------------------------------------------------------
+
+9. find_name_lengths_series et find_max_element : from source.fonctions import find_name_lengths_serie,
+find_max_element / prend en entrée un df puis retourne une série de longueurs de chaine de caractères
+basés sur les éléments de la colonne "name". La deuxième fonction prend en entrée la collection de longueurs
+puis retourne la longueur max de chaine de caractères.
+
+def find_name_length_series(df: pd.DataFrame) -> pd.Series:
+    lengths: pd.Series = df["name"].str.len()
+    return lengths
+
+def find_max_element(collection: Collection) -> int:
+    return max(collection) if len(collection) else 0
+--------------------------------------------------------------------------------------------------------
+
+10 et 10 bis. compute_length et prepare_data : from source.fonctions import compute_length, prepare_data / la
+première fonction prend en entrée une chaine de caractère et retourne un entier. La deuxième fonction
+prend en entrée un dataframe et retourne un dataframe modifié : on concatène une copie du df original
+avec une colonne de longueurs de chaines de caractères basée sur la colonne name et créée à partir de
+la fonction compute_length.
+
+def compute_length(word: str) -> int:
+    return len(word)
+
+def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
+    return pd.concat([
+        df.copy(deep=True),  # copie profonde
+        df.name.apply(compute_length).rename("name_len"),
+    ], axis=1)
+--------------------------------------------------------------------------------------------------------
+
+11. create_name_len_col_bis : from source.fonctions import create_name_len_col / la fonction prend un 
+dataframe en entrée et définit une colonne d'origine dans laquelle on va calculer la longueur de chaine
+de caractères et retourne une colonne de destination qui contiendra la longueur de la chaine de 
+caractères, renommée en "target_col". On déclare ensuite des labels : ici le label nom (ou colonne 
+d'origine de notre fonction) sera "name" et le label longueur du nom (soit la colonne de 
+destination) sera "name_len". Cette colonne de destination générée à partir de la fonction
+"create_name_len_col" sera concaténée au df d'origine.
+
+def create_name_len_col(df: pd.DataFrame, orig_col: str, target_col: str) -> pd.Series:
+    return df[orig_col].str.len().rename(target_col)
+
+name_label, name_len_label = "name", "name_len"
+pd.concat([
+    df,
+    create_name_len_col(df, name_label, name_len_label)
+], axis=1)
+
+# Création du DataFrame
+df = pd.DataFrame({"name": ["bert", "albert"]})
+
+df_prepared = create_name_len_col(df, "name", "name_len")
+
+print(df_prepared) # le résultat incluera uniquement la colonne "target", soit "name_len"
+--------------------------------------------------------------------------------------------------------
+
+12. create_name_len_col_ter : from source.fonctions import create_name_len_col_bis / la fonction prend un 
+dataframe en entrée et définit une colonne d'origine dans laquelle on va calculer la longueur de chaine
+de caractères et retourne une colonne de destination qui contiendra la longueur de la chaine de 
+caractères, renommée en "target_col". On crée un nouveau df basé sur une copie du df original, puis on
+ajoute à ce nouveau df une colonne "target col" qui contiendra les longueurs de chaine de caractères. 
+On déclare ensuite des labels : ici le label nom (ou colonne d'origine de notre fonction) sera "name" 
+et le label longueur du nom (soit la colonne de destination) sera "name_len". On crée ensuite le df final 
+en utilisant la fonction create_name_len_col_bis, qui contiendra les données du df de départ et la 
+colonne de destination "name_len".
+
+def create_name_len_col_bis(df: pd.DataFrame, orig_col: str, target_col: str) -> pd.DataFrame:
+    # Créer un nouveau DataFrame avec les deux colonnes
+    new_df = df[[orig_col]].copy()  # Inclure la colonne originale
+    new_df[target_col] = df[orig_col].str.len()  # Ajouter la colonne de longueur des noms
+    return new_df
+
+# Création du DataFrame
+df = pd.DataFrame({"name": ["bert", "albert"]})
+
+# Utilisation des noms de colonnes pour la fonction
+name_label, name_len_label = "name", "name_len"
+df_prepared_bis = create_name_len_col_bis(df, name_label, name_len_label)
+
+print(df_prepared_bis)
+

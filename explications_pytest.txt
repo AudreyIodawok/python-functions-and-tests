@@ -1,0 +1,158 @@
+-----------------------------------------------------------------------------------
+PYCACHE
+-----------------------------------------------------------------------------------
+
+Le répertoire __pycache__ est créé par Python pour stocker des fichiers bytecode 
+compilés (.pyc) lorsqu'un module Python est importé. Ces fichiers bytecode sont 
+utilisés pour accélérer le chargement des modules Python en évitant la nécessité 
+de recompiler le code source à chaque fois qu'il est importé.
+
+Dans le contexte des tests, le répertoire __pycache__ peut contenir les fichiers 
+bytecode des modules importés dans vos scripts de test. Cela peut inclure des 
+fichiers importés depuis d'autres modules ou des bibliothèques externes utilisées 
+dans vos tests.
+
+Il est généralement sans importance pour l'exécution de vos tests, et vous pouvez 
+généralement l'ignorer. Cependant, vous pouvez également choisir de l'ajouter 
+à votre fichier .gitignore si vous utilisez Git pour versionner votre code, 
+afin d'éviter de versionner ces fichiers inutiles.
+
+-----------------------------------------------------------------------------------
+.PYTEST_CACHE
+-----------------------------------------------------------------------------------
+
+Le répertoire .pytest_cache est un répertoire créé par pytest pour stocker des 
+informations en cache afin d'accélérer l'exécution ultérieure des tests. Il 
+contient des données telles que les résultats des tests précédemment exécutés, 
+les traces d'exécution et d'autres métadonnées liées à l'exécution des tests.
+
+Voici quelques-unes des raisons pour lesquelles .pytest_cache est utilisé :
+
+1. Accélération des tests : pytest utilise le cache pour éviter de réexécuter des 
+tests qui n'ont pas été modifiés depuis la dernière exécution. Cela permet 
+d'économiser du temps lors du développement et de l'exécution des tests.
+
+2. Stockage des résultats des tests : les résultats des tests précédemment exécutés 
+sont stockés dans le cache, ce qui permet à pytest d'afficher rapidement les 
+résultats lors des exécutions ultérieures.
+
+3. Optimisation de la découverte des tests : pytest utilise le cache pour 
+stocker des informations sur la structure du projet et la localisation des tests, 
+ce qui permet une découverte plus rapide des tests lors des exécutions ultérieures.
+
+Le répertoire .pytest_cache peut être enregistré dans votre système de contrôle 
+de version si vous le souhaitez, mais il est courant de l'ignorer en l'ajoutant 
+à votre fichier .gitignore ou à votre configuration de gestion de version similaire. 
+Cela évite d'encombrer votre dépôt avec des fichiers générés et permet à chaque 
+développeur de reconstruire son propre cache localement.
+
+-----------------------------------------------------------------------------------
+CREER LES FICHIERS __INIT__.PY
+-----------------------------------------------------------------------------------
+
+type nul > source\__init__.py
+type nul > tests\__init__.py
+
+(ou directement depuis l'explorateur de fichiers à gauche)
+
+-----------------------------------------------------------------------------------
+POUR LANCER LES TESTS DEPUIS LE TERMINAL (dans l'environnement virtuel)
+-----------------------------------------------------------------------------------
+
+Créer l'environnement virtuel
+PS C:\Users\Utilisateur\Documents\Formation_Data\Fonctions> python -m venv venv
+
+Activer l'environnement virtuel
+PS C:\Users\Utilisateur\Documents\Formation_Data\Fonctions> .\venv\Scripts\activate
+
+Lancer le test :
+ex :
+(venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Fonctions> pytest tests/test_create_name_len_col.py
+soit :
+(venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Fonctions> pytest tests/test_'nom_de_la_fonction'.py
+
+Désactiver l'environnement virtuel
+(venv) PS C:\Users\Utilisateur\Documents\Formation_Data\Fonctions> deactivate
+
+-----------------------------------------------------------------------------------
+FONCTIONNEMENT DE @PYTEST.MARK.PARAMETRIZE
+-----------------------------------------------------------------------------------
+
+Le décorateur "@pytest.mark.parametrize' prend deux arguments principaux :
+
+1. Les noms des paramètres : une chaîne contenant les noms des paramètres
+séparés par des virgules,
+2. Les valeurs des paramètres : une liste de tuples contenant les valeurs
+à tester pour chaque paramètre.
+
+Exemple simple :
+-----------------------------------------------------------------------------------
+import pytest
+
+# Fonction à tester :
+def add(a, b):
+    return a + b 
+
+# Définition des cas de test :
+@pytest.mark.parametrize("a, b, expected", [
+    (1, 2, 3),
+    (2, 3, 5),
+    (3, 4, 7),
+    (10, -5, 5),
+]) # liste des tuples de valeurs à tester
+def test_add(a, b, expected):
+    assert add(a, b) == expected
+# pytest exécutera "test_add" quatre fois, une pour chaque tuples dans la liste, en
+# passant les valeurs a, b et expected
+
+Autre exemple :
+-----------------------------------------------------------------------------------
+# Fonction à tester :
+import pandas as pd
+
+def create_name_len_col(series: pd.Series) -> pd.Series:
+    return series.str.len()
+
+# Définition des cas de test :
+import pytest
+import pandas as pd
+from source.fonctions import create_name_len_col
+
+@pytest.mark.parametrize("series1, series2", [
+    (pd.Series([]), pd.Series([])),  # Cas où la série est vide
+    (pd.Series(["bert"]), pd.Series([4])),  # Cas avec un seul élément
+    (pd.Series(["bert", "roberta"]), pd.Series([4, 7]))  # Cas avec plusieurs éléments
+])
+def test_create_name_len_col(series1: pd.Series, series2: pd.Series):
+    pd.testing.assert_series_equal(create_name_len_col(series1), series2, check_dtype=False)
+
+"pd.testing.assert_series_equal" est une fonction fournie par la bibliothèque Pandas pour
+tester l'égalité de deux séries Pandas. Elle est utilisée pour vérifier que deux objets
+de type pd.Series sont identiques en termes de contenu et (si spécifié) de type de données.
+
+1. Décorateur @pytest.mark.parametrize :
+- Les paramètres "series 1" et "series 2" sont les noms des variables qui seront passées
+à la fonction de test.
+- La liste de tuples "[(pd.Series([]), (pd.Series([])), (pd.Series(["bert"]), pd.Series([4])),
+(pd.Series(["bert", "roberta"]), pd.Series([4, 7]))]" contient les différentes séries à tester. 
+
+2. Fonction de test :
+def test_create_name_len_col(series1: pd.Series, series2: pd.Series):
+    pd.testing.assert_series_equal(create_name_len_col(series1), series2, check_dtype=False)
+
+    - "series1" est la série d'entrée.
+    - "series2" est la série attendue en sortie.
+    - "pd.testing.assert_series_equal(create_name_len_col(series1), series2, check_dtype = False)"
+    appelle la fonction "create_name_len_col" avec "series1" comme argument et vérifie que la
+    sortie est égale à "series2".
+    - Le paramètre "check_dtype = False" indique que la vérification du type de données est
+    ignorée (par défaut, "assert_series_equal" vérifierait également que les types de données
+    correspondent exactement).
+
+Pourquoi utiliser "pd.testing.assert_series_equal" ?
+    - Précision : "assert_series_equal" vérifie non seulement que les valeurs des séries sont
+    égales, mais d'autres aspects tels que les index.
+    - Robustesse : Il fournit des messages d'erreur détaillés en cas d'échec, ce qui aide à 
+    diagnostiquer les problèmes.
+    - Flexibilité : Avec des paramètres comme "check_dtype = False", vous pouvez adapter les 
+    vérifications selon vos besoins.
